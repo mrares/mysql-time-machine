@@ -76,6 +76,7 @@ public class KafkaApplier implements Applier {
         props.put("buffer.memory", 33554432); // Default value: 33554432
         props.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer");
         props.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer");
+        props.put("metric.reporters", "com.booking.replication.applier.KafkaMetricsCollector");
         producer = new KafkaProducer<>(props);
         topicList = topics;
     }
@@ -108,7 +109,7 @@ public class KafkaApplier implements Applier {
                     }
                 });
                 if (totalRowsCounter % 500 == 0) {
-                    LOGGER.info("500 lines have been sent to Kafka broker...");
+                    LOGGER.debug("500 lines have been sent to Kafka broker...");
                 }
                 kafka_messages.mark();
             } else {
