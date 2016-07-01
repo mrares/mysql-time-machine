@@ -97,8 +97,9 @@ public class Replicator {
         } else if (configuration.getApplierType().toLowerCase().equals("kafka")) {
             applier = new KafkaApplier(
                     configuration.getKafkaBrokerAddress(),
-                    configuration.getKafkaTopicList(),
-                    configuration
+                    configuration.getKafkaTopic(),
+                    configuration.getKafkaTableList(),
+                    startBinlogPosition
             );
         } else {
             throw new RuntimeException(String.format("Unknown applier: %s", configuration.getApplierType()));

@@ -53,6 +53,11 @@ public class KafkaMetricsCollector implements MetricsReporter {
         }
     }
 
+    @Override
+    public void metricRemoval(KafkaMetric kafkaMetric) {
+        LOGGER.debug("Got metric removal request that I will ignore...");
+    }
+
     private static class KafkaMetricGauge implements Gauge<Double> {
         private static final Logger LOGGER = LoggerFactory.getLogger(KafkaMetricGauge.class);
 

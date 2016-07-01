@@ -228,7 +228,8 @@ public class Configuration {
 
     private static class KafkaConfiguration {
         public String broker;
-        public List<String> topics;
+        public String topic;
+        public List<String> replicate_tables;
     }
 
     public int getReplicantPort() {
@@ -351,7 +352,15 @@ public class Configuration {
         return kafka.broker;
     }
 
-    public List<String> getKafkaTopicList() {
-        return kafka.topics;
+    public List<String> getKafkaTableList() {
+        return kafka.replicate_tables;
+    }
+
+    public String getKafkaTopic() {
+        if (kafka.topic != null) {
+            return kafka.topic;
+        } else {
+            throw new RuntimeException("Kafka topic not set!");
+        }
     }
 }
