@@ -23,7 +23,6 @@ import com.codahale.metrics.Timer;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import org.apache.commons.lang.mutable.MutableLong;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
@@ -38,6 +37,7 @@ import org.apache.kafka.common.TopicPartition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -59,9 +59,8 @@ public class KafkaApplier implements Applier {
     private static final Counter eventSkipCounter = Metrics.registry.counter(name("Kafka", "eventSkipCounter"));
     private static final Meter kafka_messages = Metrics.registry.meter(name("Kafka", "producerToBroker"));
     private static final Timer closureTimer = Metrics.registry.timer(name("Kafka", "producerCloseTimer"));
-    private static final HashMap<String, MutableLong> stats = new HashMap<>();
 
-    static Properties consumerConfig(String group, String servers) {
+    private static Properties consumerConfig(String group, String servers) {
         Properties props = new Properties();
         props.put("group.id", group);
         props.put("bootstrap.servers", servers);
@@ -74,7 +73,7 @@ public class KafkaApplier implements Applier {
         return props;
     }
 
-    static Properties producerConfig(String broker) {
+    private static Properties producerConfig(String broker) {
         Properties props = new Properties();
         props.put("bootstrap.servers", broker);
         props.put("acks", "all"); // Default 1
@@ -158,7 +157,7 @@ public class KafkaApplier implements Applier {
                         } else {
                             perPartitionLastPosition.put(record.partition(), new BinlogPositionInfo(binlog, position));
                         }
-                    } catch (Exception e) {
+                    } catch (IOException e) {
                         LOGGER.error("Failed to deserialize row: \n" + record.value());
                         e.printStackTrace();
                         System.exit(2);
